@@ -1,7 +1,6 @@
-// CitiesContext.jsx
 import { createContext, useState, useEffect, useContext } from "react";
 
-const API_URL = "http://localhost:8000"; // (kis szóközhiba javítva)
+const API_URL = "http://localhost:8000";
 const CitiesContext = createContext();
 
 function CitiesProvider({ children }) {
