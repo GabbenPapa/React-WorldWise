@@ -12,13 +12,14 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function CityItem({ city }) {
-  const { currentCity } = useCities();
+  const { currentCity, deleteCity } = useCities();
   const { cityName, emoji, date, id, position } = city;
 
   console.log("Current ID:", currentCity?.id, "This ID:", id);
 
-  async function deleteCity() {
-    console.log("Deleting city");
+  async function haneleDeleteCity(e) {
+    e.preventDefault();
+    deleteCity(id);
   }
 
   return (
@@ -32,7 +33,7 @@ function CityItem({ city }) {
         <span className={styles.emoji}>{emoji}</span>
         <h3 className={styles.name}>{cityName}</h3>
         <time className={styles.date}>({formatDate(date)})</time>
-        <button className={styles.deleteBtn} onClick={deleteCity}>
+        <button className={styles.deleteBtn} onClick={haneleDeleteCity}>
           &times;
         </button>
       </Link>
