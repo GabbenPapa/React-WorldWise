@@ -24,12 +24,14 @@ function reducer(state, action) {
         ...state,
         cities: [...state.cities, action.payload],
         currentCity: action.payload,
+        isLoading: false,
       };
     case "city/deleted":
       return {
         ...state,
         cities: state.cities.filter((city) => city.id !== action.payload),
         currentCity: {},
+        isLoading: false,
       };
     case "rejected":
       return { ...state, isLoading: false, error: action.payload };
