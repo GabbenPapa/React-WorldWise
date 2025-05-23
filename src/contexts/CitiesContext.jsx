@@ -1,9 +1,15 @@
-import { createContext, useEffect, useContext, useReducer } from "react";
+import {
+  createContext,
+  useEffect,
+  useContext,
+  useReducer,
+  useCallback,
+} from "react";
 
 const API_URL = "http://localhost:8000";
 const CitiesContext = createContext();
 
-const initioalStete = {
+const initialState = {
   cities: [],
   isLoading: false,
   currentCity: {},
@@ -42,9 +48,9 @@ function reducer(state, action) {
 }
 
 function CitiesProvider({ children }) {
-  const [{ cities, isLoading, currentCity }, dispatch] = useReducer(
+  const [{ cities, isLoading, currentCity, error }, dispatch] = useReducer(
     reducer,
-    initioalStete
+    initialState
   );
 
   useEffect(() => {
@@ -54,7 +60,7 @@ function CitiesProvider({ children }) {
         const res = await fetch(`${API_URL}/cities`);
         const data = await res.json();
         dispatch({ type: "cities/loaded", payload: data });
-      } catch (error) {
+      } catch {
         dispatch({
           type: "rejected",
           payload: "There was an error loading data",
@@ -64,25 +70,28 @@ function CitiesProvider({ children }) {
     fetchCities();
   }, []);
 
-  async function getCity(id) {
-    if (currentCity.id === Number(id)) return;
+  const getCity = useCallback(
+    async function getCity(id) {
+      if (Number(id) === currentCity.id) return;
 
-    dispatch({ type: "loading" });
-    try {
-      const res = await fetch(`${API_URL}/cities/${id}`);
-      const data = await res.json();
-      dispatch({ type: "city/loaded", payload: data });
-    } catch (error) {
-      dispatch({
-        type: "rejected",
-        payload: "There was an error loading city",
-      });
-    }
-  }
+      dispatch({ type: "loading" });
+      try {
+        const res = await fetch(`${API_URL}/cities/${id}`);
+        const data = await res.json();
+        dispatch({ type: "city/loaded", payload: data });
+      } catch {
+        dispatch({
+          type: "rejected",
+          payload: "There was an error loading the city...",
+        });
+      }
+    },
+    [currentCity.id]
+  );
 
   async function createCity(newCity) {
+    dispatch({ type: "loading" });
     try {
-      dispatch({ type: "loading" });
       const res = await fetch(`${API_URL}/cities`, {
         method: "POST",
         headers: {
@@ -93,7 +102,7 @@ function CitiesProvider({ children }) {
 
       const data = await res.json();
       dispatch({ type: "city/created", payload: data });
-    } catch (error) {
+    } catch {
       dispatch({
         type: "rejected",
         payload: "There was an error creating city",
@@ -108,11 +117,12 @@ function CitiesProvider({ children }) {
       await fetch(`${API_URL}/cities/${id}`, {
         method: "DELETE",
       });
+
       dispatch({ type: "city/deleted", payload: id });
-    } catch (error) {
+    } catch {
       dispatch({
         type: "rejected",
-        payload: "There was an error loading data",
+        payload: "There was an error deleting the city...",
       });
     }
   }
@@ -123,6 +133,7 @@ function CitiesProvider({ children }) {
         cities,
         isLoading,
         currentCity,
+        error,
         getCity,
         createCity,
         deleteCity,
