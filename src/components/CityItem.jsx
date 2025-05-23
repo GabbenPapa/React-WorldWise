@@ -15,8 +15,6 @@ function CityItem({ city }) {
   const { currentCity, deleteCity } = useCities();
   const { cityName, emoji, date, id, position } = city;
 
-  console.log("Current ID:", currentCity?.id, "This ID:", id);
-
   async function haneleDeleteCity(e) {
     e.preventDefault();
     deleteCity(id);
